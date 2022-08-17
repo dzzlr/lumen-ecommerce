@@ -14,5 +14,22 @@
 */
 
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+    return response()->json([
+        'messages' => 'Your request has been successfully',
+        'version' => $router->app->version()
+    ]);
 });
+
+// $router->get('/user/{nama}', 'LoginController@get_nama');
+
+$router->group(['prefix' => 'api'], function () use ($router) {
+    $router->post('/login', 'AuthController@login');
+    $router->post('/register', 'AuthController@register');
+
+    $router->group(['middleware' => 'auth'], function () use ($router) {
+        $router->group(['prefix' => 'product'], function () use ($router) {
+            
+        });
+    });
+});
+// $router->get('/user/{id}', ['middleware' => 'auth', 'uses' => 'UserController@get_user']);
