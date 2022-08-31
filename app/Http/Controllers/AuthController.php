@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -14,56 +17,42 @@ class AuthController extends Controller
      *
      * When user success login will retrive callback as api_token
      */
-    public function __construct()
+    private $request;
+
+    public function __construct(Request $request)
     {
-        //
+        $this->request = $request;
+    }
+
+    protected function jwt(User $user) 
+    {
+        $payload = [
+            'iss' => "bearer", // Issuer of the token
+            'sub' => $user->uuid, // Subject of the token
+            'iat' => time(), // Time when JWT was issued. 
+            'exp' => time() + 60*60 // Expiration time
+        ];
+
+        return JWT::encode($payload, env('JWT_SECRET'), 'HS256');
     }
 
     public function login(Request $request)
     {
-        $hasher = app()->make('hash');
+        $validated = $this->validate($request, [
+            'email' => 'required',
+            'password' => 'required'
+        ]);
 
-        // $login = $request->validate([
-        //     'email' => 'required|string',
-        //     'password' => 'required|string',
-        // ]);
-
-        // if (!Auth::attempt($login)) {
-        //     return response()->json([
-        //         'status' => 'failed',
-        //         'message' => 'Your email or password incorrect!'
-        //     ]);
-        // }
-
-        // $api_token = Auth::user()->createToken
-
-        $email = $request->input('email');
-        $password = $request->input('password');
-
-        $login = User::where('email', $email)->first();
-        if (!$login) {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Your email or password incorrect!'
-            ]);
-        } else {
-            if ($hasher->check($password, $login->password)) {
-                $api_token = sha1(time());
-                $create_token = User::where('uuid', $login->uuid)->update(['api_token' => $api_token]);
-                if ($create_token) {
-                    return response()->json([
-                        'status' => 'success',
-                        'api_token' => $api_token,
-                        'message' => $login
-                    ]);
-                }
-            } else {
-                return response()->json([
-                    'status' => 'failed',
-                    'message' => 'Your email or password incorrect!'
-                ]);
-            }
+        $user = User::where('email', $validated['email'])->first();
+        if (!Hash::check($validated['password'], $user->password)) {
+            return abort(401, 'Your email or password incorrect!');
         }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $user,
+            'access_token' => $this->jwt($user),
+        ]);
     }
 
     public function register(Request $request)
@@ -86,21 +75,35 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Account created successfully'
-            ]);
+            ], 200);
         }
         else {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Account failed to created'
-            ]);
+            ], 400);
         }
     }
 
-    // public function get_nama(Request $request)
-    // {
-    //     return response()->json([
-    //         'messages' => 'Your request has been successfully',
-    //         'nama' => $request->nama
-    //     ]);
-    // }
+    public function logout()
+    {
+        Auth::logout();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logged out successfully'
+        ], 200);
+    }
+
+    public function getUser(Request $request)
+    {
+        $token = $request->bearerToken();
+        $credentials = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
+
+        $user = User::where('uuid', $credentials->sub)->first();
+
+        return response()->json([
+            'messages' => 'Your request has been successfully',
+            'data' => $user
+        ]);
+    }
 }

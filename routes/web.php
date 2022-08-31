@@ -25,10 +25,17 @@ $router->get('/', function () use ($router) {
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('/login', 'AuthController@login');
     $router->post('/register', 'AuthController@register');
+    // $router->get('/user', 'AuthController@getUser');
+    
+    $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
+        // $router->get('/users', function() {
+        //     $users = App\Models\User::all();
+        //     return response()->json($users);
+        // });
 
-    $router->group(['middleware' => 'auth'], function () use ($router) {
         $router->group(['prefix' => 'product'], function () use ($router) {
-            
+            $router->get('/', 'ProductController@index');
+            $router->post('/', 'ProductController@store');
         });
     });
 });
