@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
+
 /** @var \Laravel\Lumen\Routing\Router $router */
 
 /*
@@ -25,17 +27,28 @@ $router->get('/', function () use ($router) {
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('/login', 'AuthController@login');
     $router->post('/register', 'AuthController@register');
-    // $router->get('/user', 'AuthController@getUser');
     
     $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
-        // $router->get('/users', function() {
-        //     $users = App\Models\User::all();
-        //     return response()->json($users);
-        // });
+        $router->get('/user-info', 'UserController@show');
+        $router->put('/user-info/update', 'UserController@update');
+        $router->put('/user-info/password/update', 'UserController@updatePassword');
+        
+        $router->group(['prefix' => 'shop'], function () use ($router) {
+            $router->get('/', 'ShopController@index');
+            $router->post('/create', 'ShopController@store');
+            $router->delete('/delete/{id}', 'ShopController@destroy');
+
+            $router->get('/shop-info/{id}', 'ShopController@show');
+            $router->put('/shop-info/update/{id}', 'ShopController@update');
+        });
 
         $router->group(['prefix' => 'product'], function () use ($router) {
             $router->get('/', 'ProductController@index');
-            $router->post('/', 'ProductController@store');
+            $router->post('/create', 'ProductController@store');
+            $router->delete('/delete/{id}', 'ProductController@destroy');
+
+            $router->put('/product-info/{id}', 'ProductController@show');
+            $router->delete('/product-info/update/{id}', 'ProductController@update');
         });
     });
 });

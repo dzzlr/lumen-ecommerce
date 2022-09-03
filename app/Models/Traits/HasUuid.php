@@ -14,4 +14,12 @@ trait HasUuid
             }
         });
     }
+
+    // protected static function boot() {
+    //     static::creating(function ($model) {
+    //         if ( ! $model->getKey()) {
+    //             $model->{$model->getKeyName()} = (string) Str::uuid();
+    //         }
+    //     });
+    // }
 }

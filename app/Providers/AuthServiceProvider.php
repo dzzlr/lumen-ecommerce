@@ -43,7 +43,7 @@ class AuthServiceProvider extends ServiceProvider
             $token = $auth[1];
             try {
                 $decoded = JWT::decode($token, env('JWT_SECRET'), 'HS256');
-                return User::find($decoded->sub);
+                return User::where('id', $decoded->sub)->first();
             } catch (\Throwable $th) {
                 return null;
             }

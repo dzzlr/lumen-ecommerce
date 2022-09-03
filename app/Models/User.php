@@ -9,10 +9,31 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
+use Illuminate\Support\Str;
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, HasFactory, HasUuid;
+
+    /**
+     * Get the value indicating whether the IDs are incrementing.
+     *
+     * @return bool
+     */
+    public function getIncrementing()
+    {
+        return false;
+    }
+
+    /**
+     * Get the auto-incrementing key type.
+     *
+     * @return string
+     */
+    public function getKeyType()
+    {
+        return 'string';
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -23,7 +44,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'username', 'name', 'email', 'password', 'api_token'
     ];
 
-    protected $primaryKey = 'uuid';
+    protected $primaryKey = 'id';
     protected $keyType = 'string';
     public $incrementing = false;
 

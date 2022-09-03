@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -28,7 +26,7 @@ class AuthController extends Controller
     {
         $payload = [
             'iss' => "bearer", // Issuer of the token
-            'sub' => $user->uuid, // Subject of the token
+            'sub' => $user->id, // Subject of the token
             'iat' => time(), // Time when JWT was issued. 
             'exp' => time() + 60*60 // Expiration time
         ];
@@ -40,7 +38,7 @@ class AuthController extends Controller
     {
         $validated = $this->validate($request, [
             'email' => 'required',
-            'password' => 'required'
+            'password' => 'required|min:6'
         ]);
 
         $user = User::where('email', $validated['email'])->first();
@@ -57,19 +55,14 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $hasher = app()->make('hash');
-
-        $username = $request->input('username');
-        $name = $request->input('name');
-        $email = $request->input('email');
-        $password = $hasher->make($request->input('password'));
-
-        $register = User::create([
-            'username'=> $username,
-            'name'=> $name,
-            'email'=> $email,
-            'password'=> $password,
+        $validated = $this->validate($request, [
+            'username' => 'required|max:150',
+            'name' => 'required',
+            'email' => 'required',
+            'password' => 'required|min:6'
         ]);
+
+        $register = User::create($validated);
 
         if ($register) {
             return response()->json([
@@ -85,25 +78,41 @@ class AuthController extends Controller
         }
     }
 
-    public function logout()
-    {
-        Auth::logout();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Logged out successfully'
-        ], 200);
-    }
-
-    public function getUser(Request $request)
+    public function updatePassword(Request $request)
     {
         $token = $request->bearerToken();
         $credentials = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
 
-        $user = User::where('uuid', $credentials->sub)->first();
-
-        return response()->json([
-            'messages' => 'Your request has been successfully',
-            'data' => $user
+        $validated = $this->validate($request, [
+            'password' => 'required|min:6',
+            'new_password' => 'required|min:6',
+            'new_confirm_password' => 'required|min:6',
         ]);
+
+        $user = User::where('id', $credentials->sub)->first();
+
+        $password_old = $request->password;
+        if (Hash::check($password_old, $user->password)) {
+            if ($validated["new_password"] == $validated["new_confirm_password"]) {
+                $validated["new_password"] = Hash::make($validated["new_password"]);
+
+                $user->fill(['password' => $validated["new_password"]])->save();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Successfully updated user password'
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'Failed to update user password'
+                ], 400);
+            }
+        } else {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'Your old password doesn\'t match'
+            ], 400);
+        }
     }
 }
