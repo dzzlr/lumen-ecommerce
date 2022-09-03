@@ -77,42 +77,4 @@ class AuthController extends Controller
             ], 400);
         }
     }
-
-    public function updatePassword(Request $request)
-    {
-        $token = $request->bearerToken();
-        $credentials = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
-
-        $validated = $this->validate($request, [
-            'password' => 'required|min:6',
-            'new_password' => 'required|min:6',
-            'new_confirm_password' => 'required|min:6',
-        ]);
-
-        $user = User::where('id', $credentials->sub)->first();
-
-        $password_old = $request->password;
-        if (Hash::check($password_old, $user->password)) {
-            if ($validated["new_password"] == $validated["new_confirm_password"]) {
-                $validated["new_password"] = Hash::make($validated["new_password"]);
-
-                $user->fill(['password' => $validated["new_password"]])->save();
-
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Successfully updated user password'
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => 'failed',
-                    'message' => 'Failed to update user password'
-                ], 400);
-            }
-        } else {
-            return response()->json([
-                'status' => 'failed',
-                'message' => 'Your old password doesn\'t match'
-            ], 400);
-        }
-    }
 }
