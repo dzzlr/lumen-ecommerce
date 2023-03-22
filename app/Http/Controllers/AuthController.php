@@ -43,12 +43,17 @@ class AuthController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
         if (!Hash::check($validated['password'], $user->password)) {
-            return abort(401, 'Your email or password incorrect!');
+            // return abort(401, 'Your email or password incorrect!');
+            return response()->json([
+                'code' => 401,
+                'status' => "UNAUTHORIZED",
+                'message' => 'Your email or password is incorrect'
+            ]);
         }
 
         return response()->json([
-            'status' => 'success',
-            'message' => $user,
+            'code' => 200,
+            'status' => 'OK',
             'access_token' => $this->jwt($user),
         ]);
     }
@@ -62,11 +67,13 @@ class AuthController extends Controller
             'password' => 'required|min:6'
         ]);
 
+        $validated['password'] = Hash::make($validated['password']);
         $register = User::create($validated);
 
         if ($register) {
             return response()->json([
-                'status' => 'success',
+                'code' => 200,
+                'status' => 'OK',
                 'message' => 'Account created successfully'
             ], 200);
         }
