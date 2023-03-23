@@ -1,9 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
-// use Illuminate\Http\Request;
-// use Firebase\JWT\JWT;
-// use Firebase\JWT\Key;
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
@@ -25,25 +22,15 @@ $router->get('/', function () use ($router) {
     ]);
 });
 
-// $router->get('/user/{nama}', 'LoginController@get_nama');
 
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('/login', 'AuthController@login');
     $router->post('/register', 'AuthController@register');
-
-    // $router->get('/logintoken', function (Request $request) use ($router) {
-    //     $token = $request->bearerToken();
-    //     $data = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
-    //     return response()->json([
-    //         'token' => $token,
-    //         'data' => $data
-    //     ]);
-    // });
     
-    // $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
-    //     $router->get('/user-info', 'UserController@show');
-    //     $router->put('/user-info/update', 'UserController@update');
-    //     $router->put('/user-info/password/update', 'UserController@updatePassword');
+    $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
+        $router->get('/user-info', 'UserController@show');
+        $router->put('/user-info/update', 'UserController@update');
+        $router->put('/user-info/password/update', 'UserController@updatePassword');
         
         $router->group(['prefix' => 'shop'], function () use ($router) {
             $router->get('/', 'ShopController@index');
@@ -62,6 +49,6 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->put('/product-info/{id}', 'ProductController@show');
             $router->delete('/product-info/update/{id}', 'ProductController@update');
         });
-    // });
+    });
 });
 // $router->get('/user/{id}', ['middleware' => 'auth', 'uses' => 'UserController@get_user']);

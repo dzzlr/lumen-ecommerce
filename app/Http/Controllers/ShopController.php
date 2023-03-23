@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
 use App\Models\Shop;
+use App\Models\User;
 
 class ShopController extends Controller
 {
@@ -14,7 +18,12 @@ class ShopController extends Controller
      */
     public function index()
     {
-        //
+        $data = Shop::all()->makeHidden(['user_id']);
+        return response()->json([
+            'code' => 200,
+            'status' => 'OK',
+            'data' => $data
+        ]);
     }
 
     /**
@@ -35,26 +44,31 @@ class ShopController extends Controller
      */
     public function store(Request $request)
     {
+        $token = $request->bearerToken();
+        $credentials = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
+
+        $user = User::where('id', $credentials->sub)->first();
+
         $validated = $this->validate($request, [
             'name' => 'required|max:255',
             'description' => 'nullable|max:200',
             'address' => 'nullable|max:200',
-            'phone' => 'nullable|max:13',
-            'logo' => 'nullable|max:255'
+            'image' => 'nullable|max:255'
         ]);
 
-        $validated['user_id'] = $request->user_id;
+        $validated['user_id'] = $user->id;
         $shop = Shop::create($validated);
         if ($shop) {
             return response()->json([
-                'status' => 'success',
-                'message' => 'Shop created successfully',
-                'data' => $shop
+                'code' => 200,
+                'status' => 'OK',
+                'message' => 'Shop created successfully'
             ], 200);
         }
         else {
             return response()->json([
-                'status' => 'failed',
+                'code' => 400,
+                'status' => 'BAD_REQUEST',
                 'message' => 'Shop failed to created'
             ], 400);
         }
@@ -72,14 +86,15 @@ class ShopController extends Controller
 
         if ($shop) {
             return response()->json([
-                'status' => 'success',
-                'messages' => 'Successfully get retrieved shop info data',
-                'data' => $shop
+                'code' => 200,
+                'status' => 'OK',
+                'message' => 'Successfully get retrieved shop info data',
+                'data' => $shop->makeHidden(['user_id'])
             ], 200);
-        }
-        else {
+        } else {
             return response()->json([
-                'status' => 'failed',
+                'code' => 400,
+                'status' => 'BAD_REQUEST',
                 'message' => 'Failed to get retrieve shop info data'
             ], 400);
         }
@@ -109,8 +124,7 @@ class ShopController extends Controller
             'name' => 'sometimes|max:255',
             'description' => 'sometimes|max:200',
             'address' => 'sometimes|max:200',
-            'phone' => 'sometimes|max:13',
-            'logo' => 'sometimes|max:255'
+            'image' => 'sometimes|max:255'
         ]);
 
         $shop = Shop::where('id', $id)->update($validated);

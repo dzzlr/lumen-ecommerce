@@ -14,14 +14,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('shops', function (Blueprint $table) {
-            $table->id();
-            $table->uuid('user_id');
+            $table->uuid('id')->primary()->unique();
+            $table->string('user_id', 37);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->string('name');
             $table->string('description')->nullable();
             $table->string('address')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('logo')->nullable();
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

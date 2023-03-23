@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Vendor;
+use App\Models\Shop;
 
 class Product extends Model
 {
@@ -25,8 +25,8 @@ class Product extends Model
     //     });
     // }
 
-    // public function vendor()
-    // {
-    //     return $this->belongsTo(Vendor::class);
-    // }
+    public function vendor()
+    {
+        return $this->belongsTo(Shop::class);
+    }
 }

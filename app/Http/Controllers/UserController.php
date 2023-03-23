@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Hash;
+
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -42,9 +43,8 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display a store info by User.
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request)
@@ -52,17 +52,28 @@ class UserController extends Controller
         $token = $request->bearerToken();
         $credentials = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
 
-        $user = User::where('id', $credentials->sub)->first();
+        $user = User::find($credentials->sub);
+        
+        $shop = $user->shop;
+        
+        if (is_null($shop)) {
+            $shop = null;
+        } else {
+            $shop = $shop->makeHidden(['user_id']);
+        }
 
         if ($user) {
             return response()->json([
-                'status' => 'success',
-                'messages' => 'Successfully get retrieved user info data',
-                'data' => $user
+                'code' => 200,
+                'status' => 'OK',
+                'message' => 'Successfully get retrieved user info data',
+                'data' => [$user, 'shop' => $shop][0]
             ], 200);
-        } else {
+        }
+        else {
             return response()->json([
-                'status' => 'failed',
+                'code' => 400,
+                'status' => 'BAD_REQUEST',
                 'message' => 'Failed to get retrieve user info data'
             ], 400);
         }

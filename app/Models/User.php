@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Support\Str;
 
+use App\Models\Shop;
+
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, HasFactory, HasUuid;
@@ -56,4 +58,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password', 'api_token'
     ];
+
+    public function shop()
+    {
+        return $this->hasOne(Shop::class);
+    }
 }
