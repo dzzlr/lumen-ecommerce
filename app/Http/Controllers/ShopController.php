@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-use App\Models\Shop;
 use App\Models\User;
+use App\Models\Shop;
 
 class ShopController extends Controller
 {
@@ -114,32 +114,32 @@ class ShopController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
+     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         $validated = $this->validate($request, [
-            'name' => 'sometimes|max:255',
-            'description' => 'sometimes|max:200',
-            'address' => 'sometimes|max:200',
-            'image' => 'sometimes|max:255'
+            'name' => 'nullable|max:255',
+            'description' => 'nullable|max:200',
+            'address' => 'nullable|max:200',
+            'image' => 'nullable|max:255'
         ]);
 
         $shop = Shop::where('id', $id)->update($validated);
-        $shop_data = Shop::where('id', $id)->first();
 
         if ($shop) {
             return response()->json([
-                'status' => 'success',
+                'code' => 200,
+                'status' => 'OK',
                 'message' => 'Successfully updated shop info data',
-                'data' => $shop_data
             ], 200);
         }
         else {
             return response()->json([
-                'status' => 'failed',
+                'code' => 400,
+                'status' => 'BAD_REQUEST',
                 'message' => 'Failed to update shop info data'
             ], 400);
         }
@@ -157,13 +157,15 @@ class ShopController extends Controller
 
         if ($shop) {
             return response()->json([
-                'status' => 'success',
+                'code' => 200,
+                'status' => 'OK',
                 'message' => 'Successfully deleted shop',
             ], 200);
         }
         else {
             return response()->json([
-                'status' => 'failed',
+                'code' => 400,
+                'status' => 'BAD_REQUEST',
                 'message' => 'Failed to delete shop'
             ], 400);
         }

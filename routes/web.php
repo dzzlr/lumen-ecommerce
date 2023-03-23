@@ -22,10 +22,10 @@ $router->get('/', function () use ($router) {
     ]);
 });
 
-
 $router->group(['prefix' => 'api'], function () use ($router) {
     $router->post('/login', 'AuthController@login');
     $router->post('/register', 'AuthController@register');
+    $router->post('/logout', 'AuthController@logout'); # Not Done
     
     $router->group(['middleware' => 'jwt.auth'], function () use ($router) {
         $router->get('/user-info', 'UserController@show');
@@ -38,7 +38,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->delete('/delete/{id}', 'ShopController@destroy');
 
             $router->get('/shop-info/{id}', 'ShopController@show');
-            $router->put('/shop-info/update/{id}', 'ShopController@update');
+            $router->post('/shop-info/update/{id}', 'ShopController@update');
         });
 
         $router->group(['prefix' => 'product'], function () use ($router) {
@@ -51,4 +51,3 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         });
     });
 });
-// $router->get('/user/{id}', ['middleware' => 'auth', 'uses' => 'UserController@get_user']);
