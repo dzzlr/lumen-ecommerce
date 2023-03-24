@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('api_token')->nullable();
             $table->rememberToken();
             $table->timestamps();
-            $table->softDeletes();
+            // $table->softDeletes();
         });
     }
 

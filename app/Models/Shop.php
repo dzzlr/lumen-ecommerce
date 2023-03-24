@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Traits\HasUuid;
+
 use App\Models\User;
 use App\Models\Product;
-use App\Models\Traits\HasUuid;
 
 class Shop extends Model
 {

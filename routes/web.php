@@ -46,8 +46,8 @@ $router->group(['prefix' => 'api'], function () use ($router) {
             $router->post('/create', 'ProductController@store');
             $router->delete('/delete/{id}', 'ProductController@destroy');
 
-            $router->put('/product-info/{id}', 'ProductController@show');
-            $router->delete('/product-info/update/{id}', 'ProductController@update');
+            $router->get('/product-info/{id}', 'ProductController@show');
+            $router->post('/product-info/update/{id}', 'ProductController@update');
         });
     });
 });
