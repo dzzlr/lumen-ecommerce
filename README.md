@@ -1,24 +1,16 @@
-# Lumen PHP Framework
+## About E-Commerce API
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://img.shields.io/packagist/dt/laravel/lumen-framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://img.shields.io/packagist/v/laravel/lumen-framework)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://img.shields.io/packagist/l/laravel/lumen)](https://packagist.org/packages/laravel/lumen-framework)
+This example API allows you to integrate your prototype system of E-Commerce. You can manage products, orders, and shops using all APIs that we provided in this document. Lumen E-Commerce API Services is a JSON-based OAuth2 API. All requests must be secure (http) and authenticated.
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+## Requirements
+- PHP >= 7.3.0
+- Laravel/Lumen
 
-## Official Documentation
-
-Documentation for the framework can be found on the [Lumen website](https://lumen.laravel.com/docs).
-
-## Contributing
-
-Thank you for considering contributing to Lumen! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Usage
+1. Clone this repository.
+2. Duplicate `.env.example` and rename it to `.env` then make  changes according to your development server configuration.
+3. Run the command `composer install` in the project folder of this repository.
+4. Run the command `php artisan key:generate`
+5. Create a database called `db_ecommerce` (match with your .env) on your development server
+6. Run the command `php artisan migrate:fresh --seed`
+7. Run the app `php -S localhost:8000 -t public`
