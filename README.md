@@ -7,7 +7,7 @@ This example API allows you to integrate your prototype system of E-Commerce. Yo
 - Laravel/Lumen
 
 ## Usage
-1. Clone this repository.
+1. Fork this repository.
 2. Duplicate `.env.example` and rename it to `.env` then make  changes according to your development server configuration.
 3. Run the command `composer install` in the project folder of this repository.
 4. Run the command `php artisan key:generate`
